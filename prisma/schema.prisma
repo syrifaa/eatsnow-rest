@@ -1,0 +1,40 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model user_premium {
+  id          Int     @id @default(autoincrement())
+  email       String  @db.VarChar(255) @unique
+  username    String  @db.VarChar(255)
+  password    String  @db.VarChar(255)
+  profile_img String  @db.VarChar(255) @default("profile_img.png")
+  points      Int     @default(0)
+
+  voucher     user_voucher[]
+}
+
+model voucher {
+  id      Int     @id @default(autoincrement())
+  title   String  @db.VarChar(255) @unique
+  desc    String  @db.VarChar(255)
+
+  user    user_voucher[]
+}
+
+model user_voucher {
+  user   user_premium @relation(fields: [user_id], references: [id])
+  voucher voucher @relation(fields: [voucher_id], references: [id])
+
+  user_id Int
+  voucher_id Int
+
+  @@id([user_id, voucher_id])
+}
