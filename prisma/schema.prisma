@@ -11,8 +11,7 @@ datasource db {
 }
 
 model user_premium {
-  id          Int     @id @default(autoincrement())
-  email       String  @db.VarChar(255) @unique
+  email       String  @id @db.VarChar(255) @unique
   username    String  @db.VarChar(255)
   password    String  @db.VarChar(255)
   profile_img String  @db.VarChar(255) @default("profile_img.png")
@@ -30,10 +29,10 @@ model voucher {
 }
 
 model user_voucher {
-  user   user_premium @relation(fields: [user_id], references: [id])
+  user   user_premium @relation(fields: [user_id], references: [email])
   voucher voucher @relation(fields: [voucher_id], references: [id])
 
-  user_id Int
+  user_id String @db.VarChar(255)
   voucher_id Int
 
   @@id([user_id, voucher_id])

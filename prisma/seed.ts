@@ -1,11 +1,7 @@
 import { db } from "../src/utils/db.server";
+import { User } from "../src/user/user.service";
 
-type User = {
-    email: string;
-    username: string;
-    password: string;
-    profile_img?: string;
-};
+type seedUser = Omit<User, "points">;
 
 type Voucher = {
     title: string;
@@ -13,7 +9,7 @@ type Voucher = {
 }
 
 type UserVoucher = {
-    user_id: number;
+    user_id: string;
     voucher_id: number;
 }
 
@@ -30,6 +26,7 @@ async function seed() {
                     email: email,
                 },
                 update: {
+                    email: email,
                     username: username,
                     password: password,
                     profile_img: profile_img ?? "profile_img.png",
@@ -90,12 +87,12 @@ async function seed() {
     await db.user_voucher.upsert({
         where: {
             user_id_voucher_id: { 
-                user_id: user1.id, 
+                user_id: user1.email, 
                 voucher_id: voucher1.id 
             }
         },
-        update: { user_id: user1.id, voucher_id: voucher1.id },
-        create: { user_id: user1.id, voucher_id: voucher1.id },
+        update: { user_id: user1.email, voucher_id: voucher1.id },
+        create: { user_id: user1.email, voucher_id: voucher1.id },
     });
 }
 
@@ -105,18 +102,19 @@ seed()
  * Creating some fake users.
  * @returns Array of users
  */
-function getUsers(): Array<User> {
+function getUsers(): Array<seedUser> {
     return [
         {
             email: "earlvonraven@gmail.com",
             username: "Raven",
-            password: "password"
-
+            password: "password",
+            profile_img: "profile_img.png"
         },
         {
             email: "13521023@std.stei.itb.ac.id",
             username: "Kenny",
-            password: "apaya"
+            password: "apaya",
+            profile_img: "profile_img.png"
         },
     ];
 }
