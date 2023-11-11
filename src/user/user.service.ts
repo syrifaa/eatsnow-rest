@@ -1,7 +1,14 @@
 import { db } from "../utils/db.server";
 
-type User = {
-    id: number,
+/**
+ * User type
+ * @property email
+ * @property username
+ * @property password
+ * @property profile_img
+ * @property points
+ */
+export type User = {
     email: string;
     username: string;
     password: string;
@@ -13,10 +20,9 @@ type User = {
  * Get all Premium User
  * @returns 
  */
-export const listUser = async (): Promise<User[]> => {
+export const getAllUser = async (): Promise<User[]> => {
     return db.user_premium.findMany({
         select: {
-            id: true,
             email: true,
             username: true,
             password: true,
@@ -27,17 +33,16 @@ export const listUser = async (): Promise<User[]> => {
 }
 
 /**
- * Get a Premium User by id
- * @param id 
+ * Get a Premium User by email
+ * @param email 
  * @returns 
  */
-export const getUser = async (id: number): Promise<User | null> => {
+export const getUser = async (email: string): Promise<User | null> => {
     return db.user_premium.findUnique({
         where: {
-            id,
+            email,
         },
         select: {
-            id: true,
             email: true,
             username: true,
             password: true,
@@ -52,7 +57,7 @@ export const getUser = async (id: number): Promise<User | null> => {
  * @param user
  * @returns 
  */
-export const createUser = async (user: Omit<User, "id" | "points">): Promise<User> => {
+export const createUser = async (user: Omit<User, "points">): Promise<User> => {
     const { email, username, password, profile_img } = user;
     return db.user_premium.create({
         data: {
@@ -62,7 +67,6 @@ export const createUser = async (user: Omit<User, "id" | "points">): Promise<Use
             profile_img,
         },
         select: {
-            id: true,
             email: true,
             username: true,
             password: true,
@@ -78,21 +82,20 @@ export const createUser = async (user: Omit<User, "id" | "points">): Promise<Use
  * @param id
  * @returns 
  */
-export const updateUser = async (user: Omit<User, "id">, id: number): Promise<User> => {
-    const { email, username, password, profile_img, points } = user;
+export const updateUser = async (user: Omit<User, "password">, hashedPassword: string, email_old: string): Promise<User> => {
+    const { email, username, profile_img, points } = user;
     return db.user_premium.update({
         where: {
-            id,
+            email: email_old,
         },
         data: {
             email,
             username,
-            password,
+            password: hashedPassword,
             profile_img,
             points,
         },
         select: {
-            id: true,
             email: true,
             username: true,
             password: true,
@@ -107,10 +110,10 @@ export const updateUser = async (user: Omit<User, "id">, id: number): Promise<Us
  * @param id
  * @returns 
  */
-export const deleteUser = async (id: number): Promise<void> => {
+export const deleteUser = async (email: string): Promise<void> => {
     await db.user_premium.delete({
         where: {
-            id,
+            email,
         },
     });
 }

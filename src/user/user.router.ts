@@ -1,4 +1,5 @@
 import express from "express";
+import bcrypt from "bcrypt";
 import type { Request, Response } from "express";
 import { body, validationResult } from "express-validator";
 import * as UserService from "./user.service";
@@ -11,7 +12,7 @@ export const userRouter = express.Router();
  */
 userRouter.get("/", async (_req: Request, res: Response) => {
     try {
-        const users = await UserService.listUser();
+        const users = await UserService.getAllUser();
         return res.status(200).json(users);
     } catch (error: any) {
         return res.status(500).json(error.message);
@@ -19,14 +20,15 @@ userRouter.get("/", async (_req: Request, res: Response) => {
 });
 
 /**
- * GET: Get a user by id
- * PATH: /api/user/:id
+ * GET: Get a user by email
+ * PATH: /api/user/:email
  */
-userRouter.get("/:id", async (req: Request, res: Response) => {
-    const id = parseInt(req.params.id, 10);
+userRouter.get("/:email", async (req: Request, res: Response) => {
+    const email = req.params.email;
+
     try {
-        const user = await UserService.getUser(id);
-        if (user) {
+        const user = await UserService.getUser(email);
+        if (user !== null) {
             return res.status(200).json(user);
         }
         return res.status(404).json("User not found");
@@ -48,10 +50,13 @@ userRouter.post(
     body("profile_img").optional().isString(), 
     async (req: Request, res: Response) => {
         const errors = validationResult(req);
+
         if (!errors.isEmpty()) {
             return res.status(400).json({ errors: errors.array() });
         }
         try {
+            const hashedPassword = bcrypt.hashSync(req.body.password, 10);
+            req.body.password = hashedPassword;
             const user = await UserService.createUser(req.body);
             return res.status(201).send(user);
         } catch (error: any) {
@@ -61,52 +66,27 @@ userRouter.post(
 );
 
 /**
- * PUT: Update a user by id for all attributes
- * PATH: /api/user/:id
+ * PUT: Update a user by email for all attributes
+ * PATH: /api/user/:email
  * BODY: { email: string, username: string, password: string, profile_img: string, points: number }
  */
 userRouter.put(
-    "/:id", 
+    "/:email", 
     body("email").isEmail(), 
     body("username").isString(), 
     body("password").isString(), 
     body("profile_img").isString(), 
     body("points").isNumeric(),
     async (req: Request, res: Response) => {
-        const id = parseInt(req.params.id, 10);
+        const email_old = req.params.email;
         const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(400).json({ errors: errors.array() });
-        }
-        try {
-            const user = await UserService.updateUser(req.body, id);
-            return res.status(200).json(user);
-        } catch (error: any) {
-            return res.status(500).json(error.message);
-        }
-    }
-);
 
-/**
- * PATCH: Update a user by id for some attributes
- * PATH: /api/user/:id
- * BODY: { email?: string, username?: string, password?: string, profile_img?: string, points?: number }
- */
-userRouter.patch(
-    "/:id", 
-    body("email").optional().isEmail(), 
-    body("username").optional().isString(), 
-    body("password").optional().isString(), 
-    body("profile_img").optional().isString(), 
-    body("points").optional().isNumeric(),
-    async (req: Request, res: Response) => {
-        const id = parseInt(req.params.id, 10);
-        const errors = validationResult(req);
         if (!errors.isEmpty()) {
             return res.status(400).json({ errors: errors.array() });
         }
         try {
-            const user = await UserService.updateUser(req.body, id);
+            const hashedPassword = bcrypt.hashSync(req.body.password, 10);
+            const user = await UserService.updateUser(req.body, hashedPassword, email_old);
             return res.status(200).json(user);
         } catch (error: any) {
             return res.status(500).json(error.message);
@@ -116,12 +96,12 @@ userRouter.patch(
 
 /**
  * DELETE: Delete a user
- * PATH: /api/user/:id
+ * PATH: /api/user/:email
  */
-userRouter.delete("/:id", async (req: Request, res: Response) => {
-    const id = parseInt(req.params.id, 10);
+userRouter.delete("/:email", async (req: Request, res: Response) => {
+    const email = req.params.email
     try {
-        await UserService.deleteUser(id);
+        await UserService.deleteUser(email);
         return res.status(204).send("User has been successfully deleted");
     } catch (error: any) {
         return res.status(500).json(error.message);

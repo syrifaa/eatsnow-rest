@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   db:
-    container_name: db
+    container_name: rest-db
     image: mysql:8.0
     ports:
       - "3307:3306"
@@ -13,7 +13,7 @@ services:
     restart: unless-stopped
     stdin_open: true
   app:
-    container_name: eatsnow-rest
+    container_name: rest-app
     build:
       context: .
       dockerfile: Dockerfile
