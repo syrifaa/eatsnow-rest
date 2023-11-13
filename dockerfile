@@ -2,10 +2,13 @@
 FROM node:alpine
 
 # Create app directory
-WORKDIR /app
+WORKDIR /eatsnow-rest
 
 # Copy package.json
 COPY package.json ./
+
+# Install app dependencies
+RUN npm install
 
 # Generated prisma files
 COPY prisma ./prisma/
@@ -19,10 +22,15 @@ COPY tsconfig.json ./
 # Copy source code
 COPY . .
 
-# Install app dependencies
-RUN npm install
-
 # Generate prisma client
-RUN npm run prisma:generate
+RUN npm run prisma:generate \
+    && npx prisma db push   \
+    && npx prisma db seed
 
-CMD ["npx", "prisma", "db", "push", "&&", "npx", "prisma", "db", "push", "&&", "npm", "run", "dev"]
+# # Create database schema
+# RUN npx prisma db push
+
+# # Seed database
+# RUN npx prisma db seed
+
+CMD ["npm", "run", "dev"]
