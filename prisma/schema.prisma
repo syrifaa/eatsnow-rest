@@ -23,7 +23,7 @@ model user_premium {
 model voucher {
   id      Int     @id @default(autoincrement())
   title   String  @db.VarChar(255) @unique
-  desc    String  @db.VarChar(255)
+  desc    Int     
 
   user    user_voucher[]
 }
@@ -34,6 +34,7 @@ model user_voucher {
 
   user_id String @db.VarChar(255)
   voucher_id Int
+  quantity Int @default(1)
 
   @@id([user_id, voucher_id])
 }
