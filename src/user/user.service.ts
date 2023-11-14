@@ -82,8 +82,8 @@ export const createUser = async (user: Omit<User, "points">): Promise<User> => {
  * @param id
  * @returns 
  */
-export const updateUser = async (user: Omit<User, "password">, hashedPassword: string, email_old: string): Promise<User> => {
-    const { email, username, profile_img, points } = user;
+export const updateUser = async (user: Omit<User, "points">, email_old: string): Promise<User> => {
+    const { email, username, password, profile_img } = user;
     return db.user_premium.update({
         where: {
             email: email_old,
@@ -91,9 +91,8 @@ export const updateUser = async (user: Omit<User, "password">, hashedPassword: s
         data: {
             email,
             username,
-            password: hashedPassword,
+            password,
             profile_img,
-            points,
         },
         select: {
             email: true,

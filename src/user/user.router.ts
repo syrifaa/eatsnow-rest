@@ -51,9 +51,17 @@ userRouter.post(
     async (req: Request, res: Response) => {
         const errors = validationResult(req);
 
+        // check if there are any errors in the request
         if (!errors.isEmpty()) {
             return res.status(400).json({ errors: errors.array() });
         }
+
+        // check if user already exists
+        const user = await UserService.getUser(req.body.email);
+        if (user !== null) {
+            return res.status(409).json("User already exists");
+        }
+
         try {
             const hashedPassword = bcrypt.hashSync(req.body.password, 10);
             req.body.password = hashedPassword;
@@ -76,7 +84,6 @@ userRouter.put(
     body("username").isString(), 
     body("password").isString(), 
     body("profile_img").isString(), 
-    body("points").isNumeric(),
     async (req: Request, res: Response) => {
         const email_old = req.params.email;
         const errors = validationResult(req);
@@ -84,9 +91,16 @@ userRouter.put(
         if (!errors.isEmpty()) {
             return res.status(400).json({ errors: errors.array() });
         }
+
+        // check if user exists
+        const user = await UserService.getUser(email_old);
+        if (user === null) {
+            return res.status(404).json("User not found");
+        }
         try {
             const hashedPassword = bcrypt.hashSync(req.body.password, 10);
-            const user = await UserService.updateUser(req.body, hashedPassword, email_old);
+            req.body.password = hashedPassword;
+            const user = await UserService.updateUser(req.body, email_old);
             return res.status(200).json(user);
         } catch (error: any) {
             return res.status(500).json(error.message);
