@@ -22,15 +22,5 @@ COPY tsconfig.json ./
 # Copy source code
 COPY . .
 
-# Generate prisma client
-RUN npm run prisma:generate \
-    && npx prisma db push   \
-    && npx prisma db seed
-
-# # Create database schema
-# RUN npx prisma db push
-
-# # Seed database
 # RUN npx prisma db seed
-
 CMD ["npm", "run", "dev"]
