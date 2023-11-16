@@ -2,9 +2,11 @@ import * as dotenv from 'dotenv';
 import express from 'express';
 import cors from 'cors';
 
+// import { accessValidation } from './security/authorization';
 import { userRouter } from './user/user.router';
 import { authRouter } from './security/authentication.router';
-import { accessValidation } from './security/authorization';
+import { voucherRouter } from './voucher/voucher.router';
+import { uservoucherRouter } from './user_voucher/user_voucher.router';
 
 dotenv.config();
 
@@ -23,7 +25,12 @@ app.use('/api/login', authRouter);
 
 app.use('/api/user', userRouter);
 
+app.use('/api/voucher', voucherRouter);
+
+app.use('/api/user_voucher', uservoucherRouter);
+
 // app.use(accessValidation);
+
 // app.use(express.urlencoded({ extended: true }));
 
 app.listen(PORT, () => {
