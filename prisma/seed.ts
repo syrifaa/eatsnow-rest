@@ -1,12 +1,8 @@
 import { db } from "../src/utils/db.server";
 import { User } from "../src/user/user.service";
+import { Voucher } from "../src/voucher/voucher.service";
 
 type seedUser = Omit<User, "points">;
-
-type Voucher = {
-    title: string;
-    desc: string;
-}
 
 type UserVoucher = {
     user_id: string;
@@ -126,12 +122,14 @@ function getUsers(): Array<seedUser> {
 function getVouchers(): Array<Voucher> {
     return [
         {
+            id: 1,
             title: "Voucher 1",
-            desc: "This is the first voucher",
+            desc: 30,
         },
         {
+            id: 2,
             title: "Voucher 2",
-            desc: "This is the second voucher",
+            desc: 100,
         },
     ]
 }

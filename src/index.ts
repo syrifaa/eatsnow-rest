@@ -3,6 +3,8 @@ import express from 'express';
 import cors from 'cors';
 
 import { userRouter } from './user/user.router';
+import { voucherRouter } from './voucher/voucher.router';
+import { uservoucherRouter } from './user_voucher/user_voucher.router';
 
 dotenv.config();
 
@@ -16,6 +18,8 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use('/api/user', userRouter);
+app.use('/api/voucher', voucherRouter);
+app.use('/api/user_voucher', uservoucherRouter);
 // app.use(express.urlencoded({ extended: true }));
 
 app.listen(PORT, () => {
