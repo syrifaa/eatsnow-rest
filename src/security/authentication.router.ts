@@ -48,12 +48,9 @@ authRouter.post(
 
         const secret = process.env.JWT_SECRET!;
 
-        // const expiresIn = 60 * 1; // 1 minutes
-        const expiresIn = 60 * 60 * 24 * 7; // 7 days
+        const expiresIn = 60 * 2; // 2 minutes
 
         const token = jwt.sign(payload, secret, { expiresIn });
-
-        res.cookie("token", token, { httpOnly: true, maxAge: expiresIn * 1000 })
 
         return res.status(200).json({
             user: user,
@@ -66,6 +63,12 @@ authRouter.post(
  * GET: Check if user is logged in
  * PATH: /api/login
  */
-authRouter.get("/", accessValidation, async (_req: Request, res: Response) => {
+authRouter.get("/", accessValidation, async (req: Request, res: Response) => {
+    req.body
     return res.status(200).json("User is logged in");
+});
+
+authRouter.delete("/", accessValidation, async (_req: Request, res: Response) => {
+    localStorage.removeItem("token");
+    return res.status(200).json("User is logged out");
 });

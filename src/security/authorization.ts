@@ -97,4 +97,30 @@ export const accessValidationAdmin = (req: Request, res: Response, next: NextFun
     next();
 }
 
+/**
+ * Give email of user
+ */
+export const getEmail = (req: Request) => {
+    const validationRequest = req as ValidationRequest;
+    const { authorization } = validationRequest.headers;
+
+    if (!authorization) {
+        return "";
+    }
+
+    const token = authorization.split(" ")[1];
+    const secret = process.env.JWT_SECRET!;
+
+    try {
+        const decoded = jwt.verify(token, secret);
+
+        if (typeof decoded !== "string") {
+            validationRequest.userData = decoded as UserData;
+        }
+
+        return validationRequest.userData.email;
+    } catch (error) {
+        return "";
+    }
+}
 

@@ -4,7 +4,7 @@ import type { Request, Response } from "express";
 import { body, validationResult } from "express-validator";
 
 import * as UserService from "./user.service";
-import { accessValidation, accessValidationUser, accessValidationAdmin } from '../security/authorization';
+import { accessValidation, accessValidationUser, accessValidationAdmin, getEmail } from '../security/authorization';
 
 
 export const userRouter = express.Router();
@@ -112,3 +112,17 @@ userRouter.route("/:email")
             return res.status(500).json(error.message);
         }
     });
+
+userRouter.get("/points", accessValidationUser, async (req: Request, res: Response) => {
+    // get email from token from middleware
+    const email = getEmail(req);
+    try {
+        const user = await UserService.getUser(email);
+        if (user === null) {
+            return res.status(404).json("User not found");
+        }
+        return res.status(200).json(user.points);
+    } catch (error: any) {
+        return res.status(500).json(error.message);
+    }
+});
