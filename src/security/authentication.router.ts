@@ -53,7 +53,7 @@ authRouter.post(
         const token = jwt.sign(payload, secret, { expiresIn });
 
         return res.status(200).json({
-            user: user,
+            email: user.email,
             token: token,
         });
     }

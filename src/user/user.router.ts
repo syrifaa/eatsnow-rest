@@ -112,17 +112,41 @@ userRouter.route("/:email")
             return res.status(500).json(error.message);
         }
     });
+userRouter.route("/points/:email")
+.put(
+    body("points").isNumeric(),
+    async (req: Request, res: Response) => {
+        const email = req.params.email;
+        const errors = validationResult(req);
 
-userRouter.get("/points", accessValidationUser, async (req: Request, res: Response) => {
-    // get email from token from middleware
-    const email = getEmail(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+        try {
+            const user = await UserService.getUser(email);
+            if (user === null) {
+                return res.status(404).json("User not found");
+            }
+            const points = req.body.points;
+            await UserService.updatePoints(email, points);
+            return res.status(200).json("Points updated");
+        } catch (error: any) {
+            return res.status(500).json(error.message);
+        }
+    }
+)
+.get(accessValidationUser, async (req: Request, res: Response) => {
+    const email = req.params.email;
+    // use getPoints
     try {
         const user = await UserService.getUser(email);
         if (user === null) {
             return res.status(404).json("User not found");
         }
-        return res.status(200).json(user.points);
+        const points = await UserService.getPoints(email);
+        return res.status(200).json(points);
     } catch (error: any) {
         return res.status(500).json(error.message);
     }
-});
+})
+;

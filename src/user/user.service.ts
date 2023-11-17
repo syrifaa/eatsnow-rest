@@ -118,3 +118,31 @@ export const deleteUser = async (email: string): Promise<void> => {
     });
 }
 
+/**
+ * Update Points Voucher
+ * @param email
+ * @param points
+ */
+export const updatePoints = async (email: string, points: number): Promise<void> => {
+    await db.user_premium.update({
+        where: {
+            email,
+        },
+        data: {
+            points,
+        },
+    });
+}
+
+// Get Points Voucher
+export const getPoints = async (email: string): Promise<number> => {
+    const user = await db.user_premium.findUnique({
+        where: {
+            email,
+        },
+        select: {
+            points: true,
+        }
+    });
+    return user!.points;
+}
