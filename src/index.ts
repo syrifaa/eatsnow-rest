@@ -7,6 +7,7 @@ import { userRouter } from './user/user.router';
 import { authRouter } from './security/authentication.router';
 import { voucherRouter } from './voucher/voucher.router';
 import { uservoucherRouter } from './user_voucher/user_voucher.router';
+import { restaurantRouter } from './restaurant/restaurant.router';
 
 dotenv.config();
 
@@ -28,9 +29,7 @@ app.use('/api/user', userRouter);
 app.use('/api/voucher', voucherRouter);
 
 app.use('/api/user_voucher', uservoucherRouter);
-
-// app.use(accessValidation);
-
+app.use('/api/restaurant', restaurantRouter);
 // app.use(express.urlencoded({ extended: true }));
 
 app.listen(PORT, () => {
